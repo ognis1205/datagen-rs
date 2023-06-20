@@ -1,12 +1,8 @@
-use std::hash::Hash;
-use std::fmt;
-use std::iter::FusedIterator;
 use crate::debug_fmt_fields;
-use crate::types::{HashSet, Entry};
-
-//pub type HashSet<V> = hashbrown::HashSet<V, ahash::RandomState>;
-
-//pub type Entry<'a, K, V, S> = hashbrown::hash_set::Entry<'a, K, V, S>;
+use crate::types::{Entry, HashSet};
+use std::fmt;
+use std::hash::Hash;
+use std::iter::FusedIterator;
 
 #[derive(Clone)]
 pub struct UniqueBy<I: Iterator, V, F> {
@@ -16,16 +12,18 @@ pub struct UniqueBy<I: Iterator, V, F> {
 }
 
 impl<I, V, F> fmt::Debug for UniqueBy<I, V, F>
-    where I: Iterator + fmt::Debug,
-          V: fmt::Debug + Hash + Eq,
+where
+    I: Iterator + fmt::Debug,
+    V: fmt::Debug + Hash + Eq,
 {
     debug_fmt_fields!(UniqueBy, iter, used);
 }
 
 pub fn unique_by<I, V, F>(iter: I, f: F) -> UniqueBy<I, V, F>
-    where V: Eq + Hash,
-          F: FnMut(&I::Item) -> V,
-          I: Iterator,
+where
+    V: Eq + Hash,
+    F: FnMut(&I::Item) -> V,
+    I: Iterator,
 {
     UniqueBy {
         iter,
@@ -35,8 +33,9 @@ pub fn unique_by<I, V, F>(iter: I, f: F) -> UniqueBy<I, V, F>
 }
 
 fn count_new_keys<I, V>(mut used: HashSet<V>, iterable: I) -> usize
-    where I: IntoIterator<Item=V>,
-          V: Hash + Eq,
+where
+    I: IntoIterator<Item = V>,
+    V: Hash + Eq,
 {
     let iter = iterable.into_iter();
     let current_used = used.len();
@@ -45,9 +44,10 @@ fn count_new_keys<I, V>(mut used: HashSet<V>, iterable: I) -> usize
 }
 
 impl<I, V, F> Iterator for UniqueBy<I, V, F>
-    where I: Iterator,
-          V: Eq + Hash,
-          F: FnMut(&I::Item) -> V
+where
+    I: Iterator,
+    V: Eq + Hash,
+    F: FnMut(&I::Item) -> V,
 {
     type Item = I::Item;
 
@@ -74,9 +74,10 @@ impl<I, V, F> Iterator for UniqueBy<I, V, F>
 }
 
 impl<I, V, F> DoubleEndedIterator for UniqueBy<I, V, F>
-    where I: DoubleEndedIterator,
-          V: Eq + Hash,
-          F: FnMut(&I::Item) -> V
+where
+    I: DoubleEndedIterator,
+    V: Eq + Hash,
+    F: FnMut(&I::Item) -> V,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
         while let Some(v) = self.iter.next_back() {
@@ -90,10 +91,12 @@ impl<I, V, F> DoubleEndedIterator for UniqueBy<I, V, F>
 }
 
 impl<I, V, F> FusedIterator for UniqueBy<I, V, F>
-    where I: FusedIterator,
-          V: Eq + Hash,
-          F: FnMut(&I::Item) -> V
-{}
+where
+    I: FusedIterator,
+    V: Eq + Hash,
+    F: FnMut(&I::Item) -> V,
+{
+}
 
 #[derive(Clone)]
 pub struct Unique<I: Iterator> {
@@ -101,28 +104,31 @@ pub struct Unique<I: Iterator> {
 }
 
 impl<I> fmt::Debug for Unique<I>
-    where I: Iterator + fmt::Debug,
-          I::Item: Hash + Eq + fmt::Debug,
+where
+    I: Iterator + fmt::Debug,
+    I::Item: Hash + Eq + fmt::Debug,
 {
     debug_fmt_fields!(Unique, iter);
 }
 
 pub fn unique<I>(iter: I) -> Unique<I>
-    where I: Iterator,
-          I::Item: Eq + Hash,
+where
+    I: Iterator,
+    I::Item: Eq + Hash,
 {
     Unique {
         iter: UniqueBy {
             iter,
             used: HashSet::with_capacity_and_hasher(0, Default::default()),
             f: (),
-        }
+        },
     }
 }
 
 impl<I> Iterator for Unique<I>
-    where I: Iterator,
-          I::Item: Eq + Hash + Clone
+where
+    I: Iterator,
+    I::Item: Eq + Hash + Clone,
 {
     type Item = I::Item;
 
@@ -149,8 +155,9 @@ impl<I> Iterator for Unique<I>
 }
 
 impl<I> DoubleEndedIterator for Unique<I>
-    where I: DoubleEndedIterator,
-          I::Item: Eq + Hash + Clone
+where
+    I: DoubleEndedIterator,
+    I::Item: Eq + Hash + Clone,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
         while let Some(v) = self.iter.iter.next_back() {
@@ -165,6 +172,8 @@ impl<I> DoubleEndedIterator for Unique<I>
 }
 
 impl<I> FusedIterator for Unique<I>
-    where I: FusedIterator,
-          I::Item: Eq + Hash + Clone
-{}
+where
+    I: FusedIterator,
+    I::Item: Eq + Hash + Clone,
+{
+}
