@@ -1,4 +1,4 @@
-use crate::iter::none::{none_by_value, NoneByValue};
+use crate::iter::none::{none_by_index, none_by_value, NoneByIndex, NoneByValue};
 use crate::iter::types::HashSet;
 use crate::iter::unique::{unique, unique_by, Unique, UniqueBy};
 use std::hash::Hash;
@@ -54,6 +54,13 @@ pub trait SamplingIterator: Iterator {
 impl<T: ?Sized> SamplingIterator for T where T: Iterator {}
 
 pub trait OptionalIterator: Iterator {
+    fn none_by_index(self, indices: HashSet<usize>) -> NoneByIndex<Self>
+    where
+        Self: Sized,
+    {
+        none_by_index(self, indices)
+    }
+
     fn none_by_value(self, values: HashSet<Self::Item>) -> NoneByValue<Self>
     where
         Self: Sized,
