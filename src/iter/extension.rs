@@ -1,9 +1,10 @@
-use crate::types::HashSet;
-use crate::unique::{unique, unique_by, Unique, UniqueBy};
+use crate::iter::none::{none_by_value, NoneByValue};
+use crate::iter::types::HashSet;
+use crate::iter::unique::{unique, unique_by, Unique, UniqueBy};
 use std::hash::Hash;
-use tinyrand::{Rand, RandRange, StdRand};
+use tinyrand::{RandRange, StdRand};
 
-pub trait Extension: Iterator {
+pub trait UniqueValueIterator: Iterator {
     fn unique(self) -> Unique<Self>
     where
         Self: Sized,
@@ -20,7 +21,11 @@ pub trait Extension: Iterator {
     {
         unique_by(self, f)
     }
+}
 
+impl<T: ?Sized> UniqueValueIterator for T where T: Iterator {}
+
+pub trait SamplingIterator: Iterator {
     fn choose(mut self, amount: usize) -> HashSet<Self::Item>
     where
         Self: Sized,
@@ -46,4 +51,15 @@ pub trait Extension: Iterator {
     }
 }
 
-impl<T: ?Sized> Extension for T where T: Iterator {}
+impl<T: ?Sized> SamplingIterator for T where T: Iterator {}
+
+pub trait OptionalIterator: Iterator {
+    fn none_by_value(self, values: HashSet<Self::Item>) -> NoneByValue<Self>
+    where
+        Self: Sized,
+    {
+        none_by_value(self, values)
+    }
+}
+
+impl<T: ?Sized> OptionalIterator for T where T: Iterator {}
