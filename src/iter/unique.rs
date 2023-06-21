@@ -1,5 +1,5 @@
 use crate::debug_fmt_fields;
-use crate::iter::types::{Entry, HashSet};
+use crate::iter::types::{KeyEntry, KeySet};
 use std::fmt;
 use std::hash::Hash;
 use std::iter::FusedIterator;
@@ -7,7 +7,7 @@ use std::iter::FusedIterator;
 #[derive(Clone)]
 pub struct UniqueBy<I: Iterator, V, F> {
     iter: I,
-    used: HashSet<V>,
+    used: KeySet<V>,
     f: F,
 }
 
@@ -27,12 +27,12 @@ where
 {
     UniqueBy {
         iter,
-        used: HashSet::with_capacity_and_hasher(0, Default::default()),
+        used: KeySet::with_capacity_and_hasher(0, Default::default()),
         f,
     }
 }
 
-fn count_new_keys<I, V>(mut used: HashSet<V>, iterable: I) -> usize
+fn count_new_keys<I, V>(mut used: KeySet<V>, iterable: I) -> usize
 where
     I: IntoIterator<Item = V>,
     V: Hash + Eq,
@@ -119,7 +119,7 @@ where
     Unique {
         iter: UniqueBy {
             iter,
-            used: HashSet::with_capacity_and_hasher(0, Default::default()),
+            used: KeySet::with_capacity_and_hasher(0, Default::default()),
             f: (),
         },
     }
@@ -134,7 +134,7 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(v) = self.iter.iter.next() {
-            if let Entry::Vacant(e) = self.iter.used.entry(v) {
+            if let KeyEntry::Vacant(e) = self.iter.used.entry(v) {
                 let k = e.get().clone();
                 e.insert();
                 return Some(k);
@@ -161,7 +161,7 @@ where
 {
     fn next_back(&mut self) -> Option<Self::Item> {
         while let Some(v) = self.iter.iter.next_back() {
-            if let Entry::Vacant(e) = self.iter.used.entry(v) {
+            if let KeyEntry::Vacant(e) = self.iter.used.entry(v) {
                 let k = e.get().clone();
                 e.insert();
                 return Some(k);

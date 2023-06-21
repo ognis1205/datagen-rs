@@ -1,5 +1,5 @@
 use crate::debug_fmt_fields;
-use crate::iter::types::HashSet;
+use crate::iter::types::KeySet;
 use std::fmt;
 use std::hash::Hash;
 use std::iter::FusedIterator;
@@ -7,7 +7,7 @@ use std::iter::FusedIterator;
 #[derive(Clone)]
 pub struct NoneByValue<I: Iterator> {
     iter: I,
-    values: HashSet<I::Item>,
+    values: KeySet<I::Item>,
 }
 
 impl<I> fmt::Debug for NoneByValue<I>
@@ -18,7 +18,7 @@ where
     debug_fmt_fields!(NoneByValue, iter, values);
 }
 
-pub fn none_by_value<I>(iter: I, values: HashSet<I::Item>) -> NoneByValue<I>
+pub fn none_by_value<I>(iter: I, values: KeySet<I::Item>) -> NoneByValue<I>
 where
     I: Iterator,
 {
@@ -84,7 +84,7 @@ where
 pub struct NoneByIndex<I: Iterator> {
     iter: I,
     head: usize,
-    indices: HashSet<usize>,
+    indices: KeySet<usize>,
 }
 
 impl<I> fmt::Debug for NoneByIndex<I>
@@ -95,7 +95,7 @@ where
     debug_fmt_fields!(NoneByIndex, iter, head, indices);
 }
 
-pub fn none_by_index<I>(iter: I, indices: HashSet<usize>) -> NoneByIndex<I>
+pub fn none_by_index<I>(iter: I, indices: KeySet<usize>) -> NoneByIndex<I>
 where
     I: Iterator,
 {

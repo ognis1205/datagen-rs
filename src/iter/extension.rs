@@ -1,5 +1,5 @@
 use crate::iter::none::{none_by_index, none_by_value, NoneByIndex, NoneByValue};
-use crate::iter::types::HashSet;
+pub use crate::iter::types::KeySet;
 use crate::iter::unique::{unique, unique_by, Unique, UniqueBy};
 use std::hash::Hash;
 use tinyrand::{RandRange, StdRand};
@@ -26,13 +26,13 @@ pub trait UniqueValueIterator: Iterator {
 impl<T: ?Sized> UniqueValueIterator for T where T: Iterator {}
 
 pub trait SamplingIterator: Iterator {
-    fn choose(mut self, amount: usize) -> HashSet<Self::Item>
+    fn choose(mut self, amount: usize) -> KeySet<Self::Item>
     where
         Self: Sized,
         Self::Item: Clone + Eq + Hash,
     {
         if amount < 1 {
-            return HashSet::with_capacity_and_hasher(0, Default::default());
+            return KeySet::with_capacity_and_hasher(0, Default::default());
         }
         let mut rand = StdRand::default();
         let mut reservoir = Vec::with_capacity(amount);
@@ -47,21 +47,21 @@ pub trait SamplingIterator: Iterator {
         } else {
             reservoir.shrink_to_fit();
         }
-        HashSet::from_iter(reservoir)
+        KeySet::from_iter(reservoir)
     }
 }
 
 impl<T: ?Sized> SamplingIterator for T where T: Iterator {}
 
 pub trait OptionalIterator: Iterator {
-    fn none_by_index(self, indices: HashSet<usize>) -> NoneByIndex<Self>
+    fn none_by_index(self, indices: KeySet<usize>) -> NoneByIndex<Self>
     where
         Self: Sized,
     {
         none_by_index(self, indices)
     }
 
-    fn none_by_value(self, values: HashSet<Self::Item>) -> NoneByValue<Self>
+    fn none_by_value(self, values: KeySet<Self::Item>) -> NoneByValue<Self>
     where
         Self: Sized,
     {

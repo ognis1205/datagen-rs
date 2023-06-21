@@ -1,15 +1,9 @@
 use anyhow::Result;
 use csv::Writer;
-use h2o::iter::extension::{OptionalIterator, SamplingIterator, UniqueValueIterator};
-use h2o::iter::types::HashSet;
+use h2o::iter::extension::{KeySet, OptionalIterator, SamplingIterator, UniqueValueIterator};
+use indicatif::ProgressIterator;
 use std::time::{Duration, Instant};
 use tinyrand::{Rand, RandRange, StdRand};
-//use rayon::prelude::*;
-use indicatif::ProgressIterator;
-//use polars::prelude::*;
-//use rand::distributions::Distribution;
-//use rand::distributions::Uniform;
-//use rand::seq::IteratorRandom;
 
 fn main() -> Result<()> {
     let start = Instant::now();
@@ -30,7 +24,7 @@ fn main() -> Result<()> {
     let values: Vec<_> = (0..N)
         .map(|_| rand.next_range(1..N / K))
         //        .none_by_value(uniques)
-        .none_by_index(HashSet::from_iter(vec![0, 1, 2, 3]))
+        .none_by_index(KeySet::from_iter(vec![0, 1, 2, 3]))
         .collect();
 
     //    println!("{:?}", values);
@@ -41,11 +35,6 @@ fn main() -> Result<()> {
         end.as_secs(),
         end.subsec_nanos() / 1_000_000
     );
-
-    //    let mut wtr = Writer::from_path("foo.csv")?;
-    //    wtr.write_record(&[Some("a"), Some("b"), Some("c")])?;
-    //    wtr.write_record(&[Some("x"), None, Some("z")])?;
-    //    wtr.flush()?;
 
     Ok(())
 }
