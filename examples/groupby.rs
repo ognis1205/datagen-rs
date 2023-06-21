@@ -35,7 +35,57 @@ fn main() {
     let start = Instant::now();
 
     info!("Creating id1 column...");
-    let config = Config::new(&Some("./id1.csv".to_string()));
+    let config = Config::new("./id1.csv");
+    let (seed, mut rand) = init_rand();
+    let unique_id1s = (0..args.number_of_rows)
+        .map(|_| rand.next_range(1..args.k_groups_factors))
+        .unique()
+        .choose(
+            (args.k_groups_factors * args.nas_ratio / 100)
+                .try_into()
+                .unwrap(),
+        );
+    let mut rand = rewind_rand(seed);
+    let mut writer = config.writer().unwrap();
+    for id1 in (0..args.number_of_rows)
+        .map(|_| rand.next_range(1..args.k_groups_factors))
+        .progress()
+        .none_by_value(unique_id1s)
+    {
+        if let Some(id1) = id1 {
+            writer.write_record(&[id1.to_string()]);
+        } else {
+            writer.write_record(&[b""]);
+        }
+    }
+
+    info!("Creating id2 column...");
+    let config = Config::new("./id2.csv");
+    let (seed, mut rand) = init_rand();
+    let unique_id1s = (0..args.number_of_rows)
+        .map(|_| rand.next_range(1..args.k_groups_factors))
+        .unique()
+        .choose(
+            (args.k_groups_factors * args.nas_ratio / 100)
+                .try_into()
+                .unwrap(),
+        );
+    let mut rand = rewind_rand(seed);
+    let mut writer = config.writer().unwrap();
+    for id1 in (0..args.number_of_rows)
+        .map(|_| rand.next_range(1..args.k_groups_factors))
+        .progress()
+        .none_by_value(unique_id1s)
+    {
+        if let Some(id1) = id1 {
+            writer.write_record(&[id1.to_string()]);
+        } else {
+            writer.write_record(&[b""]);
+        }
+    }
+
+    info!("Creating id3 column...");
+    let config = Config::new("./id3.csv");
     let (seed, mut rand) = init_rand();
     let unique_id1s = (0..args.number_of_rows)
         .map(|_| rand.next_range(1..args.k_groups_factors))

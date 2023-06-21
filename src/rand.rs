@@ -1,6 +1,6 @@
 use rand::Rng;
 pub use tinyrand::RandRange;
-use tinyrand::{Rand, Seeded, StdRand};
+use tinyrand::{Seeded, StdRand};
 
 pub fn init() -> (u64, StdRand) {
     let seed: u64 = rand::thread_rng().gen();

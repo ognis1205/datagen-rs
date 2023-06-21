@@ -1,7 +1,6 @@
 use csv;
 use std::fs;
-use std::io::{self, Read};
-use std::ops::Deref;
+use std::io;
 use std::path::PathBuf;
 
 #[derive(Debug)]
@@ -18,12 +17,28 @@ pub struct Config {
     quoting: bool,
 }
 
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            path: None,
+            delimiter: b',',
+            no_headers: true,
+            flexible: false,
+            terminator: csv::Terminator::Any(b'\n'),
+            quote: b'"',
+            quote_style: csv::QuoteStyle::Never,
+            double_quote: false,
+            escape: None,
+            quoting: false,
+        }
+    }
+}
+
 impl Config {
-    pub fn new(path: &Option<String>) -> Config {
-        let (path, delimiter) = match *path {
-            None => (None, b','),
-            Some(ref s) if s.deref() == "-" => (None, b','),
-            Some(ref s) => {
+    pub fn new(path: &str) -> Config {
+        let (path, delimiter) = match path {
+            s if s == "-" => (None, b','),
+            s => {
                 let path = PathBuf::from(s);
                 let delimiter = if path.extension().map_or(false, |v| v == "tsv" || v == "tab") {
                     b'\t'
@@ -47,10 +62,8 @@ impl Config {
         }
     }
 
-    pub fn delimiter(mut self, delimiter: Option<u8>) -> Config {
-        if let Some(delimiter) = delimiter {
-            self.delimiter = delimiter;
-        }
+    pub fn delimiter(mut self, delimiter: u8) -> Config {
+        self.delimiter = delimiter;
         self
     }
 
@@ -149,7 +162,7 @@ impl Config {
         })
     }
 
-    pub fn from_reader<R: Read>(&self, reader: R) -> csv::Reader<R> {
+    pub fn from_reader<R: io::Read>(&self, reader: R) -> csv::Reader<R> {
         csv::ReaderBuilder::new()
             .flexible(self.flexible)
             .delimiter(self.delimiter)
