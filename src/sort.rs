@@ -28,7 +28,6 @@ impl ops::Deref for Selector {
     }
 }
 
-/// Compares `a` and `b` lexicographically using `Ord`
 fn cmp_lex<A, L, R>(mut a: L, mut b: R) -> cmp::Ordering
 where
     A: Ord,
