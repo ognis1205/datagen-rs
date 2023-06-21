@@ -41,7 +41,7 @@ impl Config {
             terminator: csv::Terminator::Any(b'\n'),
             quote: b'"',
             quote_style: csv::QuoteStyle::Never,
-            double_quote: true,
+            double_quote: false,
             escape: None,
             quoting: false,
         }
@@ -109,13 +109,13 @@ impl Config {
 
     pub fn write_headers<R: io::Read, W: io::Write>(
         &self,
-        r: &mut csv::Reader<R>,
-        w: &mut csv::Writer<W>,
+        reader: &mut csv::Reader<R>,
+        writer: &mut csv::Writer<W>,
     ) -> csv::Result<()> {
         if !self.no_headers {
-            let r = r.byte_headers()?;
-            if !r.is_empty() {
-                w.write_record(r)?;
+            let header = reader.byte_headers()?;
+            if !header.is_empty() {
+                writer.write_record(header)?;
             }
         }
         Ok(())
@@ -149,7 +149,7 @@ impl Config {
         })
     }
 
-    pub fn from_reader<R: Read>(&self, rdr: R) -> csv::Reader<R> {
+    pub fn from_reader<R: Read>(&self, reader: R) -> csv::Reader<R> {
         csv::ReaderBuilder::new()
             .flexible(self.flexible)
             .delimiter(self.delimiter)
@@ -157,10 +157,10 @@ impl Config {
             .quote(self.quote)
             .quoting(self.quoting)
             .escape(self.escape)
-            .from_reader(rdr)
+            .from_reader(reader)
     }
 
-    pub fn from_writer<W: io::Write>(&self, wtr: W) -> csv::Writer<W> {
+    pub fn from_writer<W: io::Write>(&self, writer: W) -> csv::Writer<W> {
         csv::WriterBuilder::new()
             .flexible(self.flexible)
             .delimiter(self.delimiter)
@@ -170,7 +170,7 @@ impl Config {
             .double_quote(self.double_quote)
             .escape(self.escape.unwrap_or(b'\\'))
             .buffer_capacity(32 * (1 << 10))
-            .from_writer(wtr)
+            .from_writer(writer)
     }
 
     pub fn reader_file(&self) -> io::Result<csv::Reader<fs::File>> {

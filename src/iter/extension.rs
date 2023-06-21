@@ -1,8 +1,8 @@
 use crate::iter::none::{none_by_index, none_by_value, NoneByIndex, NoneByValue};
 pub use crate::iter::types::KeySet;
 use crate::iter::unique::{unique, unique_by, Unique, UniqueBy};
+use crate::rand::{init as init_rand, RandRange};
 use std::hash::Hash;
-use tinyrand::{RandRange, StdRand};
 
 pub trait UniqueValueIterator: Iterator {
     fn unique(self) -> Unique<Self>
@@ -34,7 +34,7 @@ pub trait SamplingIterator: Iterator {
         if amount < 1 {
             return KeySet::with_capacity_and_hasher(0, Default::default());
         }
-        let mut rand = StdRand::default();
+        let (_, mut rand) = init_rand();
         let mut reservoir = Vec::with_capacity(amount);
         reservoir.extend(self.by_ref().take(amount));
         if reservoir.len() == amount {
