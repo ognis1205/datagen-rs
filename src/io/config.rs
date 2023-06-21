@@ -23,13 +23,13 @@ impl Default for Config {
             path: None,
             delimiter: b',',
             no_headers: true,
-            flexible: false,
+            flexible: true,
             terminator: csv::Terminator::Any(b'\n'),
             quote: b'"',
             quote_style: csv::QuoteStyle::Never,
             double_quote: false,
             escape: None,
-            quoting: false,
+            quoting: true,
         }
     }
 }
@@ -52,13 +52,13 @@ impl Config {
             path: path,
             delimiter: delimiter,
             no_headers: true,
-            flexible: false,
+            flexible: true,
             terminator: csv::Terminator::Any(b'\n'),
             quote: b'"',
             quote_style: csv::QuoteStyle::Never,
             double_quote: false,
             escape: None,
-            quoting: false,
+            quoting: true,
         }
     }
 
