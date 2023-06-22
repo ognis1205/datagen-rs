@@ -19,7 +19,7 @@ struct Args {
     #[arg(short = 'K', long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..))]
     k_groups_factors: u32,
     /// NAs ratio
-    #[arg(short = 'n', long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(0..100))]
+    #[arg(short = 'n', long, default_value_t = 0, value_parser = clap::value_parser!(u32).range(0..100))]
     nas_ratio: u32,
     /// Sort flag
     #[arg(short, long, default_value_t = false)]

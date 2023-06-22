@@ -185,6 +185,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "datagen"
+version = "0.1.0"
+dependencies = [
+ "ahash",
+ "anyhow",
+ "clap",
+ "csv",
+ "env_logger",
+ "hashbrown",
+ "indicatif",
+ "log",
+ "rand",
+ "tinyrand",
+]
+
+[[package]]
 name = "encode_unicode"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -233,22 +249,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "wasi",
-]
-
-[[package]]
-name = "h2o"
-version = "0.1.0"
-dependencies = [
- "ahash",
- "anyhow",
- "clap",
- "csv",
- "env_logger",
- "hashbrown",
- "indicatif",
- "log",
- "rand",
- "tinyrand",
 ]
 
 [[package]]
