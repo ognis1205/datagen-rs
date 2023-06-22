@@ -1,9 +1,9 @@
 use anyhow::Result;
 use clap::Parser;
-use h2o::io::config::Config;
-use h2o::io::manipulate::zip;
-use h2o::iter::extension::{KeySet, OptionalIterator, SamplingIterator, UniqueValueIterator};
-use h2o::rand::{init as init_rand, rewind as rewind_rand, RandRange};
+use datagen::io::config::Config;
+use datagen::io::manipulate::zip;
+use datagen::iter::extension::{KeySet, OptionalIterator, SamplingIterator, UniqueValueIterator};
+use datagen::rand::{init as init_rand, rewind as rewind_rand, RandRange};
 use indicatif::ProgressIterator;
 use log::info;
 use std::time::Instant;
@@ -29,15 +29,16 @@ struct Args {
 fn main() -> Result<()> {
     env_logger::init();
     let args = Args::parse();
+    info!(
+        "number of rows: {}, K groups factors: {}, NAs ratio: {}, Sort flag: {}",
+        args.number_of_rows, args.k_groups_factors, args.nas_ratio, args.sort
+    );
 
-    info!("number of rows: {}", args.number_of_rows);
-    info!("K groups factors: {}", args.k_groups_factors);
-    info!("NAs ratio: {}", args.nas_ratio);
-    info!("Sort flag: {}", args.sort);
     let start = Instant::now();
 
     info!("Creating id1 column...");
     {
+        info!("Creating id1 N/A values (this may take a while)...");
         let config = Config::new("./id1.csv");
         let (seed, mut rand) = init_rand();
         let unique_ids = (0..args.number_of_rows)
@@ -48,6 +49,8 @@ fn main() -> Result<()> {
                     .try_into()
                     .unwrap(),
             );
+        info!("Created id1 N/A values...");
+        info!("Dumping id1 column...");
         let mut rand = rewind_rand(seed);
         let mut writer = config.writer().unwrap();
         for id in (0..args.number_of_rows)
@@ -61,10 +64,13 @@ fn main() -> Result<()> {
                 writer.write_record(&[""])?;
             }
         }
+        info!("Dumped id1 column...");
     }
+    info!("Created id1 column...");
 
     info!("Creating id2 column...");
     {
+        info!("Creating id2 N/A values (this may take a while)...");
         let config = Config::new("./id2.csv");
         let (seed, mut rand) = init_rand();
         let unique_ids = (0..args.number_of_rows)
@@ -75,6 +81,8 @@ fn main() -> Result<()> {
                     .try_into()
                     .unwrap(),
             );
+        info!("Created id2 N/A values...");
+        info!("Dumping id2 column...");
         let mut rand = rewind_rand(seed);
         let mut writer = config.writer().unwrap();
         for id in (0..args.number_of_rows)
@@ -88,10 +96,13 @@ fn main() -> Result<()> {
                 writer.write_record(&[""])?;
             }
         }
+        info!("Dumped id2 column...");
     }
+    info!("Created id2 column...");
 
     info!("Creating id3 column...");
     {
+        info!("Creating id3 N/A values (this may take a while)...");
         let config = Config::new("./id3.csv");
         let (seed, mut rand) = init_rand();
         let unique_ids = (0..args.number_of_rows)
@@ -102,6 +113,8 @@ fn main() -> Result<()> {
                     .try_into()
                     .unwrap(),
             );
+        info!("Created id3 N/A values...");
+        info!("Dumping id3 column...");
         let mut rand = rewind_rand(seed);
         let mut writer = config.writer().unwrap();
         for id in (0..args.number_of_rows)
@@ -115,10 +128,13 @@ fn main() -> Result<()> {
                 writer.write_record(&[""])?;
             }
         }
+        info!("Dumped id3 column...");
     }
+    info!("Created id3 column...");
 
     info!("Creating id4 column...");
     {
+        info!("Creating id4 N/A values (this may take a while)...");
         let config = Config::new("./id4.csv");
         let (seed, mut rand) = init_rand();
         let unique_ids = (0..args.number_of_rows)
@@ -129,6 +145,8 @@ fn main() -> Result<()> {
                     .try_into()
                     .unwrap(),
             );
+        info!("Created id4 N/A values...");
+        info!("Dumping id4 column...");
         let mut rand = rewind_rand(seed);
         let mut writer = config.writer().unwrap();
         for id in (0..args.number_of_rows)
@@ -142,10 +160,13 @@ fn main() -> Result<()> {
                 writer.write_record(&[""])?;
             }
         }
+        info!("Dumped id4 column...");
     }
+    info!("Created id4 column...");
 
     info!("Creating id5 column...");
     {
+        info!("Creating id5 N/A values (this may take a while)...");
         let config = Config::new("./id5.csv");
         let (seed, mut rand) = init_rand();
         let unique_ids = (0..args.number_of_rows)
@@ -156,6 +177,8 @@ fn main() -> Result<()> {
                     .try_into()
                     .unwrap(),
             );
+        info!("Created id5 N/A values...");
+        info!("Dumping id5 column...");
         let mut rand = rewind_rand(seed);
         let mut writer = config.writer().unwrap();
         for id in (0..args.number_of_rows)
@@ -169,10 +192,13 @@ fn main() -> Result<()> {
                 writer.write_record(&[""])?;
             }
         }
+        info!("Dumped id5 column...");
     }
+    info!("Created id5 column...");
 
     info!("Creating id6 column...");
     {
+        info!("Creating id6 N/A values (this may take a while)...");
         let config = Config::new("./id6.csv");
         let (seed, mut rand) = init_rand();
         let unique_ids = (0..args.number_of_rows)
@@ -183,6 +209,8 @@ fn main() -> Result<()> {
                     .try_into()
                     .unwrap(),
             );
+        info!("Created id6 N/A values...");
+        info!("Dumping id6 column...");
         let mut rand = rewind_rand(seed);
         let mut writer = config.writer().unwrap();
         for id in (0..args.number_of_rows)
@@ -196,16 +224,21 @@ fn main() -> Result<()> {
                 writer.write_record(&[""])?;
             }
         }
+        info!("Dumped id6 column...");
     }
+    info!("Created id6 column...");
 
     info!("Creating v1 column...");
     {
+        info!("Creating v1 N/A indices (this may take a while)...");
         let config = Config::new("./v1.csv");
         let indices: KeySet<usize> = (0..args.number_of_rows as usize).choose(
             (args.number_of_rows * args.nas_ratio / 100)
                 .try_into()
                 .unwrap(),
         );
+        info!("Created v1 N/A indices...");
+        info!("Dumping v1 column...");
         let (_, mut rand) = init_rand();
         let mut writer = config.writer().unwrap();
         for v in (0..args.number_of_rows)
@@ -219,16 +252,21 @@ fn main() -> Result<()> {
                 writer.write_record(&[""])?;
             }
         }
+        info!("Dumped v1 column...");
     }
+    info!("Created v1 column...");
 
     info!("Creating v2 column...");
     {
+        info!("Creating v2 N/A indices (this may take a while)...");
         let config = Config::new("./v2.csv");
         let indices: KeySet<usize> = (0..args.number_of_rows as usize).choose(
             (args.number_of_rows * args.nas_ratio / 100)
                 .try_into()
                 .unwrap(),
         );
+        info!("Created v2 N/A indices...");
+        info!("Dumping v2 column...");
         let (_, mut rand) = init_rand();
         let mut writer = config.writer().unwrap();
         for v in (0..args.number_of_rows)
@@ -242,16 +280,21 @@ fn main() -> Result<()> {
                 writer.write_record(&[""])?;
             }
         }
+        info!("Dumped v2 column...");
     }
+    info!("Created v2 column...");
 
     info!("Creating v3 column...");
     {
+        info!("Creating v3 N/A indices (this may take a while)...");
         let config = Config::new("./v3.csv");
         let indices: KeySet<usize> = (0..args.number_of_rows as usize).choose(
             (args.number_of_rows * args.nas_ratio / 100)
                 .try_into()
                 .unwrap(),
         );
+        info!("Created v3 N/A indices...");
+        info!("Dumping v3 column...");
         let (_, mut rand) = init_rand();
         let mut writer = config.writer().unwrap();
         for v in (0..args.number_of_rows)
@@ -265,7 +308,9 @@ fn main() -> Result<()> {
                 writer.write_record(&[""])?;
             }
         }
+        info!("Dumped v3 column...");
     }
+    info!("Created v3 column...");
 
     info!("Merging columns...");
     {
@@ -310,6 +355,7 @@ fn main() -> Result<()> {
             ],
         )?;
     }
+    info!("Merged columns...");
 
     let end = start.elapsed();
     info!(

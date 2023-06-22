@@ -1,5 +1,5 @@
 [package]
-name = "h2o"
+name = "datagen"
 version = "0.1.0"
 authors = ["Shingo OKAWA <shingo.okawa.g.h.c@gmail.com>"]
 edition = "2021"
@@ -7,13 +7,9 @@ edition = "2021"
 [dependencies]
 ahash = "0.8.3"
 csv = "1.2.2"
-#fastrand = "2.0.0"
 hashbrown = "0.14.0"
 rand = "0.8.5"
-#rayon = "1.7.0"
 tinyrand = "0.5.0"
-#polars = "0.30.0"
-#rand = "0.8.5"
 
 [dev-dependencies]
 anyhow = "1.0.71"
