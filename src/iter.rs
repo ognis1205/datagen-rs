@@ -1,4 +1,4 @@
 pub mod extension;
-mod none;
+mod none_by;
 mod types;
-mod unique;
+mod unique_by;
