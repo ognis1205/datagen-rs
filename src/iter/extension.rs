@@ -1,7 +1,7 @@
 use crate::iter::none_by::{none_by_index, none_by_value, NoneByIndex, NoneByValue};
 pub use crate::iter::types::KeySet;
 use crate::iter::unique_by::{unique, unique_by, Unique, UniqueBy};
-use crate::rand::{init as init_rand, RandRange};
+use crate::utils::{init_rand, RandRange};
 use std::hash::Hash;
 
 pub trait UniqueValueIterator: Iterator {
