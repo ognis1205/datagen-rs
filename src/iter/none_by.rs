@@ -1,5 +1,5 @@
 use crate::debug_fmt_fields;
-use crate::iter::types::KeySet;
+use crate::iter::KeySet;
 use std::fmt;
 use std::hash::Hash;
 use std::iter::FusedIterator;
