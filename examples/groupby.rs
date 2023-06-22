@@ -3,7 +3,7 @@ use anyhow::Result;
 use clap::Parser;
 use datagen::io::config::Config;
 use datagen::io::manipulate::zip;
-use datagen::iter::extension::{KeySet, OptionalIterator, SamplingIterator, UniqueValueIterator};
+use datagen::iter::extensions::{KeySet, OptionalIterator, SamplingIterator, UniqueValueIterator};
 use datagen::utils::rand::{init as init_rand, rewind as rewind_rand, RandRange};
 use indicatif::ProgressIterator;
 use log::info;
@@ -15,13 +15,13 @@ use tempfile::tempfile;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// Name of rows
+    /// Number of rows
     #[arg(short = 'N', long, value_parser = clap::value_parser!(u32).range(1..))]
     number_of_rows: u32,
     /// K groups factors
     #[arg(short = 'K', long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..))]
     k_groups_factors: u32,
-    /// NAs ratio
+    /// N/A ratio
     #[arg(short = 'n', long, default_value_t = 0, value_parser = clap::value_parser!(u32).range(0..100))]
     nas_ratio: u32,
     /// Sort flag

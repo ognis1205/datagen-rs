@@ -1,4 +1,5 @@
 use csv;
+use std::cmp;
 use std::io;
 use std::iter::FusedIterator;
 
@@ -49,11 +50,27 @@ pub fn zip<R: io::Read, W: io::Write>(
         MultipleZip(readers.into_iter().map(csv::Reader::byte_records).collect());
     for rows in zipped_byte_records {
         let rows: Vec<_> = rows.into_iter().filter_map(|f| f.ok()).collect();
-        let row = rows
-            .iter()
-            .map(csv::ByteRecord::iter)
-            .flat_map(|it| it.clone());
+        let row = rows.iter().map(csv::ByteRecord::iter).flatten();
         writer.write_record(row)?;
     }
     Ok(())
+}
+
+fn lex_ordering<V, L, R>(mut a: L, mut b: R) -> cmp::Ordering
+where
+    V: Ord,
+    L: Iterator<Item = V>,
+    R: Iterator<Item = V>,
+{
+    loop {
+        match (a.next(), b.next()) {
+            (None, None) => return cmp::Ordering::Equal,
+            (None, _) => return cmp::Ordering::Less,
+            (_, None) => return cmp::Ordering::Greater,
+            (Some(x), Some(y)) => match x.cmp(&y) {
+                cmp::Ordering::Equal => (),
+                non_eq => return non_eq,
+            },
+        }
+    }
 }

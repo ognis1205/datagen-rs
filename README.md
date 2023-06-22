@@ -15,9 +15,9 @@ Rust program to generate H2O groupby dataset
 Usage: groupby [OPTIONS] --number-of-rows <NUMBER_OF_ROWS>
 
 Options:
-  -N, --number-of-rows <NUMBER_OF_ROWS>      Name of rows
+  -N, --number-of-rows <NUMBER_OF_ROWS>      Number of rows
   -K, --k-groups-factors <K_GROUPS_FACTORS>  K groups factors [default: 1]
-  -n, --nas-ratio <NAS_RATIO>                NAs ratio [default: 0]
+  -n, --nas-ratio <NAS_RATIO>                N/A ratio [default: 0]
   -s, --sort                                 Sort flag
   -h, --help                                 Print help
   -V, --version                              Print version
