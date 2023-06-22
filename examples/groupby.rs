@@ -4,7 +4,7 @@ use clap::Parser;
 use datagen::io::config::Config;
 use datagen::io::manipulate::zip;
 use datagen::iter::extension::{KeySet, OptionalIterator, SamplingIterator, UniqueValueIterator};
-use datagen::utils::{init_rand, rewind_rand, RandRange};
+use datagen::utils::rand::{init as init_rand, rewind as rewind_rand, RandRange};
 use indicatif::ProgressIterator;
 use log::info;
 use std::io::Seek;
