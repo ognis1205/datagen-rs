@@ -5,9 +5,9 @@ use std::io;
 use std::iter::FusedIterator;
 use tempfile::tempfile;
 
-pub struct MultipleZip<I>(Vec<I>);
+pub struct Zip<I>(Vec<I>);
 
-impl<I> Iterator for MultipleZip<I>
+impl<I> Iterator for Zip<I>
 where
     I: Iterator,
 {
@@ -30,7 +30,7 @@ where
     }
 }
 
-impl<I> DoubleEndedIterator for MultipleZip<I>
+impl<I> DoubleEndedIterator for Zip<I>
 where
     I: DoubleEndedIterator,
 {
@@ -42,18 +42,17 @@ where
     }
 }
 
-impl<I> FusedIterator for MultipleZip<I> where I: FusedIterator {}
+impl<I> FusedIterator for Zip<I> where I: FusedIterator {}
 
-//pub fn zip<R: io::Read>(readers: Vec<&mut csv::Reader<R>>) -> MultipleZip<&mut csv::Reader<R>> {
-//    MultipleZip(readers.into_iter().map(csv::Reader::byte_records).collect())
-//}
+pub fn zip<R: io::Read>(readers: Vec<&mut csv::Reader<R>>) -> Zip<csv::ByteRecordsIter<'_, R>> {
+    Zip(readers.into_iter().map(csv::Reader::byte_records).collect())
+}
 
-pub fn zip<R: io::Read, W: io::Write>(
+pub fn hstack<R: io::Read, W: io::Write>(
     writer: &mut csv::Writer<W>,
     readers: Vec<&mut csv::Reader<R>>,
 ) -> csv::Result<()> {
-    let zipped_byte_records =
-        MultipleZip(readers.into_iter().map(csv::Reader::byte_records).collect());
+    let zipped_byte_records = Zip(readers.into_iter().map(csv::Reader::byte_records).collect());
     for rows in zipped_byte_records {
         let row = rows
             .iter()

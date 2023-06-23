@@ -2,7 +2,7 @@ use anyhow::Context;
 use anyhow::Result;
 use clap::Parser;
 use datagen::io::config::Config;
-use datagen::io::manipulate::zip;
+use datagen::io::manipulate::hstack;
 use datagen::iter::extensions::{KeySet, OptionalIterator, SamplingIterator, UniqueValueIterator};
 use datagen::utils::rand::{init as init_rand, rewind as rewind_rand, RandRange};
 use indicatif::ProgressIterator;
@@ -126,7 +126,7 @@ fn main() -> Result<()> {
         let mut v1_reader = config.from_reader(&mut v1_csv);
         let mut v2_reader = config.from_reader(&mut v2_csv);
         let mut v3_reader = config.from_reader(&mut v3_csv);
-        zip(
+        hstack(
             &mut writer,
             vec![
                 &mut id1_reader,
