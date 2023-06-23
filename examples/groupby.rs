@@ -105,16 +105,7 @@ fn main() -> Result<()> {
 
     if !args.sort {
         merge(
-            &mut id1_csv,
-            &mut id2_csv,
-            &mut id3_csv,
-            &mut id4_csv,
-            &mut id5_csv,
-            &mut id6_csv,
-            &mut v1_csv,
-            &mut v2_csv,
-            &mut v3_csv,
-            &args,
+            id1_csv, id2_csv, id3_csv, id4_csv, id5_csv, id6_csv, v1_csv, v2_csv, v3_csv, &args,
             &config,
         )
         .context("failed to merge columns")?;
@@ -426,15 +417,15 @@ fn v3(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
 }
 
 fn merge(
-    id1_csv: &mut fs::File,
-    id2_csv: &mut fs::File,
-    id3_csv: &mut fs::File,
-    id4_csv: &mut fs::File,
-    id5_csv: &mut fs::File,
-    id6_csv: &mut fs::File,
-    v1_csv: &mut fs::File,
-    v2_csv: &mut fs::File,
-    v3_csv: &mut fs::File,
+    mut id1_csv: fs::File,
+    mut id2_csv: fs::File,
+    mut id3_csv: fs::File,
+    mut id4_csv: fs::File,
+    mut id5_csv: fs::File,
+    mut id6_csv: fs::File,
+    mut v1_csv: fs::File,
+    mut v2_csv: fs::File,
+    mut v3_csv: fs::File,
     args: &Args,
     config: &Config,
 ) -> Result<()> {
@@ -451,15 +442,15 @@ fn merge(
         .open(path)
         .context("failed to open the output")?;
     let mut csv_writer = config.from_writer(&mut g1_csv);
-    let mut id1_reader = config.from_reader(id1_csv);
-    let mut id2_reader = config.from_reader(id2_csv);
-    let mut id3_reader = config.from_reader(id3_csv);
-    let mut id4_reader = config.from_reader(id4_csv);
-    let mut id5_reader = config.from_reader(id5_csv);
-    let mut id6_reader = config.from_reader(id6_csv);
-    let mut v1_reader = config.from_reader(v1_csv);
-    let mut v2_reader = config.from_reader(v2_csv);
-    let mut v3_reader = config.from_reader(v3_csv);
+    let mut id1_reader = config.from_reader(&mut id1_csv);
+    let mut id2_reader = config.from_reader(&mut id2_csv);
+    let mut id3_reader = config.from_reader(&mut id3_csv);
+    let mut id4_reader = config.from_reader(&mut id4_csv);
+    let mut id5_reader = config.from_reader(&mut id5_csv);
+    let mut id6_reader = config.from_reader(&mut id6_csv);
+    let mut v1_reader = config.from_reader(&mut v1_csv);
+    let mut v2_reader = config.from_reader(&mut v2_csv);
+    let mut v3_reader = config.from_reader(&mut v3_csv);
     let zipped_iter = zip(vec![
         &mut id1_reader,
         &mut id2_reader,

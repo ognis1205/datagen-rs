@@ -110,3 +110,43 @@ where
 pub fn sorted_chunk() -> Result<fs::File, io::Error> {
     tempfile()
 }
+
+pub fn vstack<R: io::Read, W: io::Write>(
+    writer: &mut csv::Writer<W>,
+    zipped_iter: Zip<csv::ByteRecordsIter<'_, R>>,
+) -> csv::Result<()> {
+    for rows in zipped_iter {
+        let row = rows
+            .iter()
+            .filter_map(|f| f.as_ref().ok())
+            .map(csv::ByteRecord::iter)
+            .flatten();
+        writer.write_record(row)?;
+    }
+
+    //    let mut zipped_byte_records: Vec<_> =
+    //        MultipleZip(readers.into_iter().map(csv::Reader::byte_records).collect()).collect();
+    //    zipped_byte_records.sort_by(|lhs, rhs| {
+    //        let lhs = lhs
+    //            .iter()
+    //            .filter_map(|f| f.as_ref().ok())
+    //            .map(csv::ByteRecord::iter)
+    //            .flatten();
+    //        let rhs = rhs
+    //            .iter()
+    //            .filter_map(|f| f.as_ref().ok())
+    //            .map(csv::ByteRecord::iter)
+    //            .flatten();
+    //        lex_ordering(lhs, rhs)
+    //    });
+    //    for rows in zipped_byte_records {
+    //        let row = rows
+    //            .iter()
+    //            .filter_map(|f| f.as_ref().ok())
+    //            .map(csv::ByteRecord::iter)
+    //            .flatten();
+    //        writer.write_record(row)?;
+    //    }
+
+    Ok(())
+}
