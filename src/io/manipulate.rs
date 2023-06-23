@@ -1,9 +1,11 @@
 use csv;
 use std::cmp;
+use std::fs;
 use std::io;
 use std::iter::FusedIterator;
+use tempfile::tempfile;
 
-struct MultipleZip<I>(Vec<I>);
+pub struct MultipleZip<I>(Vec<I>);
 
 impl<I> Iterator for MultipleZip<I>
 where
@@ -41,6 +43,10 @@ where
 }
 
 impl<I> FusedIterator for MultipleZip<I> where I: FusedIterator {}
+
+//pub fn zip<R: io::Read>(readers: Vec<&mut csv::Reader<R>>) -> MultipleZip<&mut csv::Reader<R>> {
+//    MultipleZip(readers.into_iter().map(csv::Reader::byte_records).collect())
+//}
 
 pub fn zip<R: io::Read, W: io::Write>(
     writer: &mut csv::Writer<W>,
@@ -101,4 +107,8 @@ where
             },
         }
     }
+}
+
+pub fn sorted_chunk() -> Result<fs::File, io::Error> {
+    tempfile()
 }
