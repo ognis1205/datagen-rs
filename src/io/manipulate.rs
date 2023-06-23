@@ -49,10 +49,38 @@ pub fn zip<R: io::Read, W: io::Write>(
     let zipped_byte_records =
         MultipleZip(readers.into_iter().map(csv::Reader::byte_records).collect());
     for rows in zipped_byte_records {
-        let rows: Vec<_> = rows.into_iter().filter_map(|f| f.ok()).collect();
-        let row = rows.iter().map(csv::ByteRecord::iter).flatten();
+        let row = rows
+            .iter()
+            .filter_map(|f| f.as_ref().ok())
+            .map(csv::ByteRecord::iter)
+            .flatten();
         writer.write_record(row)?;
     }
+
+    //    let mut zipped_byte_records: Vec<_> =
+    //        MultipleZip(readers.into_iter().map(csv::Reader::byte_records).collect()).collect();
+    //    zipped_byte_records.sort_by(|lhs, rhs| {
+    //        let lhs = lhs
+    //            .iter()
+    //            .filter_map(|f| f.as_ref().ok())
+    //            .map(csv::ByteRecord::iter)
+    //            .flatten();
+    //        let rhs = rhs
+    //            .iter()
+    //            .filter_map(|f| f.as_ref().ok())
+    //            .map(csv::ByteRecord::iter)
+    //            .flatten();
+    //        lex_ordering(lhs, rhs)
+    //    });
+    //    for rows in zipped_byte_records {
+    //        let row = rows
+    //            .iter()
+    //            .filter_map(|f| f.as_ref().ok())
+    //            .map(csv::ByteRecord::iter)
+    //            .flatten();
+    //        writer.write_record(row)?;
+    //    }
+
     Ok(())
 }
 
