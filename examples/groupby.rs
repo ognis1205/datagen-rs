@@ -2,7 +2,7 @@ use anyhow::Context;
 use anyhow::Result;
 use clap::Parser;
 use datagen::io::config::Config;
-use datagen::io::manipulate::hstack;
+use datagen::io::manipulate::{hstack, zip};
 use datagen::iter::extensions::{KeySet, OptionalIterator, SamplingIterator, UniqueValueIterator};
 use datagen::utils::rand::{init as init_rand, rewind as rewind_rand, RandRange};
 use indicatif::ProgressIterator;
@@ -103,55 +103,23 @@ fn main() -> Result<()> {
         .rewind()
         .context("failed to rewind file descriptor for the v3 column")?;
 
-    log::info!("Merging columns...");
-    {
-        let mut path = path::PathBuf::new();
-        path.push(args.dir);
-        path.push(format!(
-            "./G1_{:e}_{:e}_{}_{}.csv",
-            args.number_of_rows, args.k_groups_factors, args.nas_ratio, args.sort as i32
-        ));
-        let mut file = fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .open(path)
-            .context("failed to open the output")?;
-        let mut writer = config.from_writer(&mut file);
-        let mut id1_reader = config.from_reader(&mut id1_csv);
-        let mut id2_reader = config.from_reader(&mut id2_csv);
-        let mut id3_reader = config.from_reader(&mut id3_csv);
-        let mut id4_reader = config.from_reader(&mut id4_csv);
-        let mut id5_reader = config.from_reader(&mut id5_csv);
-        let mut id6_reader = config.from_reader(&mut id6_csv);
-        let mut v1_reader = config.from_reader(&mut v1_csv);
-        let mut v2_reader = config.from_reader(&mut v2_csv);
-        let mut v3_reader = config.from_reader(&mut v3_csv);
-        hstack(
-            &mut writer,
-            vec![
-                &mut id1_reader,
-                &mut id2_reader,
-                &mut id3_reader,
-                &mut id4_reader,
-                &mut id5_reader,
-                &mut id6_reader,
-                &mut v1_reader,
-                &mut v2_reader,
-                &mut v3_reader,
-            ],
+    if !args.sort {
+        merge(
+            &mut id1_csv,
+            &mut id2_csv,
+            &mut id3_csv,
+            &mut id4_csv,
+            &mut id5_csv,
+            &mut id6_csv,
+            &mut v1_csv,
+            &mut v2_csv,
+            &mut v3_csv,
+            &args,
+            &config,
         )
-        .context("failed to zip columns")?;
-        drop(id1_csv);
-        drop(id2_csv);
-        drop(id3_csv);
-        drop(id4_csv);
-        drop(id5_csv);
-        drop(id6_csv);
-        drop(v1_csv);
-        drop(v2_csv);
-        drop(v3_csv);
+        .context("failed to merge columns")?;
+    } else {
     }
-    log::info!("Merged columns...");
 
     let end = start.elapsed();
     log::info!(
@@ -454,5 +422,65 @@ fn v3(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
         }
     }
     log::info!("Dumped v3 column...");
+    Ok(())
+}
+
+fn merge(
+    id1_csv: &mut fs::File,
+    id2_csv: &mut fs::File,
+    id3_csv: &mut fs::File,
+    id4_csv: &mut fs::File,
+    id5_csv: &mut fs::File,
+    id6_csv: &mut fs::File,
+    v1_csv: &mut fs::File,
+    v2_csv: &mut fs::File,
+    v3_csv: &mut fs::File,
+    args: &Args,
+    config: &Config,
+) -> Result<()> {
+    log::info!("Merging columns...");
+    let mut path = path::PathBuf::new();
+    path.push(&args.dir);
+    path.push(format!(
+        "./G1_{:e}_{:e}_{}_{}.csv",
+        args.number_of_rows, args.k_groups_factors, args.nas_ratio, args.sort as i32
+    ));
+    let mut g1_csv = fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .open(path)
+        .context("failed to open the output")?;
+    let mut csv_writer = config.from_writer(&mut g1_csv);
+    let mut id1_reader = config.from_reader(id1_csv);
+    let mut id2_reader = config.from_reader(id2_csv);
+    let mut id3_reader = config.from_reader(id3_csv);
+    let mut id4_reader = config.from_reader(id4_csv);
+    let mut id5_reader = config.from_reader(id5_csv);
+    let mut id6_reader = config.from_reader(id6_csv);
+    let mut v1_reader = config.from_reader(v1_csv);
+    let mut v2_reader = config.from_reader(v2_csv);
+    let mut v3_reader = config.from_reader(v3_csv);
+    let zipped_iter = zip(vec![
+        &mut id1_reader,
+        &mut id2_reader,
+        &mut id3_reader,
+        &mut id4_reader,
+        &mut id5_reader,
+        &mut id6_reader,
+        &mut v1_reader,
+        &mut v2_reader,
+        &mut v3_reader,
+    ]);
+    hstack(&mut csv_writer, zipped_iter).context("failed to zip columns")?;
+    //        drop(id1_csv);
+    //        drop(id2_csv);
+    //        drop(id3_csv);
+    //        drop(id4_csv);
+    //        drop(id5_csv);
+    //        drop(id6_csv);
+    //        drop(v1_csv);
+    //        drop(v2_csv);
+    //        drop(v3_csv);
+    log::info!("Merged columns...");
     Ok(())
 }

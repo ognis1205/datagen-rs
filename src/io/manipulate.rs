@@ -50,10 +50,9 @@ pub fn zip<R: io::Read>(readers: Vec<&mut csv::Reader<R>>) -> Zip<csv::ByteRecor
 
 pub fn hstack<R: io::Read, W: io::Write>(
     writer: &mut csv::Writer<W>,
-    readers: Vec<&mut csv::Reader<R>>,
+    zipped_iter: Zip<csv::ByteRecordsIter<'_, R>>,
 ) -> csv::Result<()> {
-    let zipped_byte_records = Zip(readers.into_iter().map(csv::Reader::byte_records).collect());
-    for rows in zipped_byte_records {
+    for rows in zipped_iter {
         let row = rows
             .iter()
             .filter_map(|f| f.as_ref().ok())
