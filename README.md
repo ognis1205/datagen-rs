@@ -19,6 +19,7 @@ Options:
   -K, --k-groups-factors <K_GROUPS_FACTORS>  K groups factors [default: 1]
   -n, --nas-ratio <NAS_RATIO>                N/A ratio [default: 0]
   -s, --sort                                 Sort flag
+  -d, --dir <DIR>                            Output directory [default: ./]
   -h, --help                                 Print help
   -V, --version                              Print version
 ```
