@@ -35,4 +35,5 @@ and without sorting, run the following command in the project directory:
 TODO
 ==============================
  - Support arbitrary working directory. The current implementation uses the system's temporary directory.
+   If this lack of the feature issues, please consider using something like `sudo mount -o remount,size=125G /tmp/`.
  - Consider using more memory/disk efficient formats (filing a PR for, e.g., arrow-rs, polars, datafusion, and so forth).
