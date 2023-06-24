@@ -4,7 +4,6 @@ use clap::Parser;
 use datagen::io::config::Config;
 use datagen::io::manipulate::{hstack, merge_sort, sort_chunk, zip};
 use datagen::iter::extensions::{KeySet, OptionalIterator, SamplingIterator, UniqueValueIterator};
-use datagen::utils::memory::get_default_sort_size;
 use datagen::utils::rand::{init as init_rand, rewind as rewind_rand, RandRange};
 use indicatif::ProgressIterator;
 use std::fs;
@@ -28,6 +27,9 @@ struct Args {
     /// Sort flag
     #[arg(short, long, default_value_t = false)]
     sort: bool,
+    #[arg(short = 'S', long, default_value_t = 1024 * 1024)]
+    /// External merge sort, run size
+    sort_size: u32,
     /// Output directory
     #[arg(short, long, default_value_t = String::from("./"))]
     dir: String,
@@ -494,7 +496,6 @@ fn merge_with_sort(
     args: &Args,
     config: &Config,
 ) -> Result<()> {
-    log::info!("Merging columns...");
     let mut path = path::PathBuf::new();
     path.push(&args.dir);
     path.push(format!(
@@ -528,19 +529,16 @@ fn merge_with_sort(
         &mut v3_reader,
     ]);
 
-    let available_memory = get_default_sort_size(1024 * 1024 * 1024);
-    let record_size = 100 * std::mem::size_of::<Vec<csv::ByteRecordsIter<'_, std::fs::File>>>();
-    let records_per_run = available_memory as i32 / record_size as i32;
-    let number_of_runs = args.number_of_rows as i32 / records_per_run
-        + (args.number_of_rows as i32 % records_per_run).signum();
-
+    let number_of_runs = args.number_of_rows / args.sort_size + 1;
     if number_of_runs <= 1 {
+        log::info!("Merging columns - single run...");
         sort_chunk(None, &mut csv_writer, &mut zipped_iter)
             .context("failed to merge-sort columns")?;
     } else {
+        log::info!("Sorting columns - {} runs...", number_of_runs);
         let working_dir = tempfile::tempdir().context("failed to create a temporary directory")?;
         let mut runs = vec![];
-        for i in 0..number_of_runs {
+        for i in (0..number_of_runs).progress() {
             let name = format!("{}.csv", i);
             let chunk = fs::OpenOptions::new()
                 .write(true)
@@ -549,7 +547,7 @@ fn merge_with_sort(
                 .context("failed to create a chunk file")?;
             let mut chunk_writer = config.from_writer(chunk);
             sort_chunk(
-                Some(records_per_run as usize),
+                Some(args.sort_size as usize),
                 &mut chunk_writer,
                 &mut zipped_iter,
             )
@@ -567,6 +565,7 @@ fn merge_with_sort(
         drop(v2_csv);
         drop(v3_csv);
 
+        log::info!("Merging columns...");
         let mut runs: Vec<_> = runs
             .iter()
             .filter_map(|run| {
