@@ -27,9 +27,9 @@ struct Args {
     /// Sort flag
     #[arg(short, long, default_value_t = false)]
     sort: bool,
-    #[arg(short = 'S', long, default_value_t = 1024 * 1024)]
     /// External merge sort, run size
-    sort_size: u32,
+    #[arg(short, long, default_value_t = 1024 * 1024)]
+    run_size: u32,
     /// Output directory
     #[arg(short, long, default_value_t = String::from("./"))]
     dir: String,
@@ -529,7 +529,7 @@ fn merge_with_sort(
         &mut v3_reader,
     ]);
 
-    let number_of_runs = args.number_of_rows / args.sort_size + 1;
+    let number_of_runs = args.number_of_rows / args.run_size + 1;
     if number_of_runs <= 1 {
         log::info!("Merging columns - single run...");
         sort_chunk(None, &mut csv_writer, &mut zipped_iter)
@@ -547,7 +547,7 @@ fn merge_with_sort(
                 .context("failed to create a chunk file")?;
             let mut chunk_writer = config.from_writer(chunk);
             sort_chunk(
-                Some(args.sort_size as usize),
+                Some(args.run_size as usize),
                 &mut chunk_writer,
                 &mut zipped_iter,
             )
