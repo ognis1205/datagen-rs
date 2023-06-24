@@ -31,3 +31,8 @@ and without sorting, run the following command in the project directory:
 ```bash
  $ export RUST_LOG=INFO; cargo run --release --example groupby -- -N 1000000000 -K 10 -n 10 --sort
 ```
+
+TODO
+==============================
+ - Support arbitrary working directory. The current implementation uses the system's temporary directory.
+ - Consider using more memory/disk efficient formats (filing a PR for, e.g., arrow-rs, polars, datafusion, and so forth).
