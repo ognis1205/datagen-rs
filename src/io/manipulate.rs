@@ -1,9 +1,7 @@
 use csv;
 use std::cmp;
-use std::fs;
 use std::io;
 use std::iter::FusedIterator;
-use tempfile::tempfile;
 
 pub struct Zip<I>(Vec<I>);
 
@@ -50,7 +48,7 @@ pub fn zip<R: io::Read>(readers: Vec<&mut csv::Reader<R>>) -> Zip<csv::ByteRecor
 
 pub fn hstack<R: io::Read, W: io::Write>(
     writer: &mut csv::Writer<W>,
-    zipped_iter: Zip<csv::ByteRecordsIter<'_, R>>,
+    zipped_iter: &mut Zip<csv::ByteRecordsIter<'_, R>>,
 ) -> csv::Result<()> {
     for rows in zipped_iter {
         let row = rows
@@ -60,31 +58,6 @@ pub fn hstack<R: io::Read, W: io::Write>(
             .flatten();
         writer.write_record(row)?;
     }
-
-    //    let mut zipped_byte_records: Vec<_> =
-    //        MultipleZip(readers.into_iter().map(csv::Reader::byte_records).collect()).collect();
-    //    zipped_byte_records.sort_by(|lhs, rhs| {
-    //        let lhs = lhs
-    //            .iter()
-    //            .filter_map(|f| f.as_ref().ok())
-    //            .map(csv::ByteRecord::iter)
-    //            .flatten();
-    //        let rhs = rhs
-    //            .iter()
-    //            .filter_map(|f| f.as_ref().ok())
-    //            .map(csv::ByteRecord::iter)
-    //            .flatten();
-    //        lex_ordering(lhs, rhs)
-    //    });
-    //    for rows in zipped_byte_records {
-    //        let row = rows
-    //            .iter()
-    //            .filter_map(|f| f.as_ref().ok())
-    //            .map(csv::ByteRecord::iter)
-    //            .flatten();
-    //        writer.write_record(row)?;
-    //    }
-
     Ok(())
 }
 
@@ -107,15 +80,29 @@ where
     }
 }
 
-pub fn sorted_chunk() -> Result<fs::File, io::Error> {
-    tempfile()
-}
-
-pub fn vstack<R: io::Read, W: io::Write>(
+pub fn sort_chunk<R: io::Read, W: io::Write>(
+    number_of_rows: Option<usize>,
     writer: &mut csv::Writer<W>,
-    zipped_iter: Zip<csv::ByteRecordsIter<'_, R>>,
+    zipped_iter: &mut Zip<csv::ByteRecordsIter<'_, R>>,
 ) -> csv::Result<()> {
-    for rows in zipped_iter {
+    let mut zipped_byte_records: Vec<_> = match number_of_rows {
+        Some(number_of_rows) => zipped_iter.take(number_of_rows).collect(),
+        _ => zipped_iter.collect(),
+    };
+    zipped_byte_records.sort_by(|lhs, rhs| {
+        let lhs = lhs
+            .iter()
+            .filter_map(|f| f.as_ref().ok())
+            .map(csv::ByteRecord::iter)
+            .flatten();
+        let rhs = rhs
+            .iter()
+            .filter_map(|f| f.as_ref().ok())
+            .map(csv::ByteRecord::iter)
+            .flatten();
+        lex_ordering(lhs, rhs)
+    });
+    for rows in zipped_byte_records {
         let row = rows
             .iter()
             .filter_map(|f| f.as_ref().ok())
@@ -123,30 +110,32 @@ pub fn vstack<R: io::Read, W: io::Write>(
             .flatten();
         writer.write_record(row)?;
     }
+    Ok(())
+}
 
-    //    let mut zipped_byte_records: Vec<_> =
-    //        MultipleZip(readers.into_iter().map(csv::Reader::byte_records).collect()).collect();
-    //    zipped_byte_records.sort_by(|lhs, rhs| {
-    //        let lhs = lhs
-    //            .iter()
-    //            .filter_map(|f| f.as_ref().ok())
-    //            .map(csv::ByteRecord::iter)
-    //            .flatten();
-    //        let rhs = rhs
-    //            .iter()
-    //            .filter_map(|f| f.as_ref().ok())
-    //            .map(csv::ByteRecord::iter)
-    //            .flatten();
-    //        lex_ordering(lhs, rhs)
-    //    });
-    //    for rows in zipped_byte_records {
-    //        let row = rows
-    //            .iter()
-    //            .filter_map(|f| f.as_ref().ok())
-    //            .map(csv::ByteRecord::iter)
-    //            .flatten();
-    //        writer.write_record(row)?;
-    //    }
-
+pub fn merge_sort<R: io::Read, W: io::Write>(
+    writer: &mut csv::Writer<W>,
+    readers: &mut Vec<csv::Reader<R>>,
+) -> csv::Result<()> {
+    let mut readers: Vec<_> = readers.into_iter().map(csv::Reader::byte_records).collect();
+    let mut values: Vec<_> = readers
+        .iter_mut()
+        .filter_map(|r| r.next())
+        .filter_map(|r| r.ok())
+        .collect();
+    while values.len() > 0 {
+        let (i, next) = values
+            .iter()
+            .enumerate()
+            .min_by(|(_, lhs), (_, rhs)| lex_ordering(lhs.iter(), rhs.iter()))
+            .unwrap();
+        writer.write_record(next)?;
+        if let Some(x) = readers[i].next() {
+            values[i] = x.unwrap();
+        } else {
+            values.remove(i);
+            readers.remove(i);
+        }
+    }
     Ok(())
 }
