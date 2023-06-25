@@ -52,80 +52,79 @@ fn main() -> Result<()> {
 
     let mut id1_csv =
         tempfile::tempfile().context("failed to create temporary file for the id1 column")?;
-    id1(&mut id1_csv, &args, &config).context("failed to create the id1 column")?;
+    create_id1(&mut id1_csv, &args, &config).context("failed to create the id1 column")?;
     id1_csv
         .rewind()
         .context("failed to rewind file descriptor for the id1 column")?;
 
     let mut id2_csv =
         tempfile::tempfile().context("failed to create temporary file for the id2 column")?;
-    id2(&mut id2_csv, &args, &config).context("failed to create the id2 column")?;
+    create_id2(&mut id2_csv, &args, &config).context("failed to create the id2 column")?;
     id2_csv
         .rewind()
         .context("failed to rewind file descriptor for the id2 column")?;
 
     let mut id3_csv =
         tempfile::tempfile().context("failed to create temporary file for the id3 column")?;
-    id3(&mut id3_csv, &args, &config).context("failed to create the id3 column")?;
+    create_id3(&mut id3_csv, &args, &config).context("failed to create the id3 column")?;
     id3_csv
         .rewind()
         .context("failed to rewind file descriptor for the id3 column")?;
 
     let mut id4_csv =
         tempfile::tempfile().context("failed to create temporary file for the id4 column")?;
-    id4(&mut id4_csv, &args, &config).context("failed to create the id4 column")?;
+    create_id4(&mut id4_csv, &args, &config).context("failed to create the id4 column")?;
     id4_csv
         .rewind()
         .context("failed to rewind file descriptor for the id4 column")?;
 
     let mut id5_csv =
         tempfile::tempfile().context("failed to create temporary file for the id5 column")?;
-    id5(&mut id5_csv, &args, &config).context("failed to create the id5 column")?;
-    {}
+    create_id5(&mut id5_csv, &args, &config).context("failed to create the id5 column")?;
     id5_csv
         .rewind()
         .context("failed to rewind file descriptor for the id5 column")?;
 
     let mut id6_csv =
         tempfile::tempfile().context("failed to create temporary file for the id6 column")?;
-    id6(&mut id6_csv, &args, &config).context("failed to create the id6 column")?;
+    create_id6(&mut id6_csv, &args, &config).context("failed to create the id6 column")?;
     id6_csv
         .rewind()
         .context("failed to rewind file descriptor for the id6 column")?;
 
     let mut v1_csv =
         tempfile::tempfile().context("failed to create temporary file for the v1 column")?;
-    v1(&mut v1_csv, &args, &config).context("failed to create the v1 column")?;
+    create_v1(&mut v1_csv, &args, &config).context("failed to create the v1 column")?;
     v1_csv
         .rewind()
         .context("failed to rewind file descriptor for the v1 column")?;
 
     let mut v2_csv =
         tempfile::tempfile().context("failed to create temporary file for the v2 column")?;
-    v2(&mut v2_csv, &args, &config).context("failed to create the v2 column")?;
+    create_v2(&mut v2_csv, &args, &config).context("failed to create the v2 column")?;
     v2_csv
         .rewind()
         .context("failed to rewind file descriptor for the v2 column")?;
 
     let mut v3_csv =
         tempfile::tempfile().context("failed to create temporary file for the v3 column")?;
-    v3(&mut v3_csv, &args, &config).context("failed to create the v3 column")?;
+    create_v3(&mut v3_csv, &args, &config).context("failed to create the v3 column")?;
     v3_csv
         .rewind()
         .context("failed to rewind file descriptor for the v3 column")?;
 
     if !args.sort {
-        merge(
+        join(
             id1_csv, id2_csv, id3_csv, id4_csv, id5_csv, id6_csv, v1_csv, v2_csv, v3_csv, &args,
             &config,
         )
-        .context("failed to merge columns")?;
+        .context("failed to join columns")?;
     } else {
-        merge_with_sort(
+        join_with_sort(
             id1_csv, id2_csv, id3_csv, id4_csv, id5_csv, id6_csv, v1_csv, v2_csv, v3_csv, &args,
             &config,
         )
-        .context("failed to merge-sort columns")?;
+        .context("failed to join columns")?;
     }
 
     let end = start.elapsed();
@@ -138,7 +137,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn id1(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
+fn create_id1(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     log::info!("Creating id1 N/A values (this may take a while)...");
     let (seed, mut rand) = init_rand();
     let unique_ids = (0..args.number_of_rows)
@@ -172,7 +171,7 @@ fn id1(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn id2(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
+fn create_id2(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     log::info!("Creating id2 N/A values (this may take a while)...");
     let (seed, mut rand) = init_rand();
     let unique_ids = (0..args.number_of_rows)
@@ -206,7 +205,7 @@ fn id2(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn id3(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
+fn create_id3(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     log::info!("Creating id3 N/A values (this may take a while)...");
     let (seed, mut rand) = init_rand();
     let unique_ids = (0..args.number_of_rows)
@@ -240,7 +239,7 @@ fn id3(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn id4(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
+fn create_id4(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     log::info!("Creating id4 N/A values (this may take a while)...");
     let (seed, mut rand) = init_rand();
     let unique_ids = (0..args.number_of_rows)
@@ -274,7 +273,7 @@ fn id4(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn id5(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
+fn create_id5(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     log::info!("Creating id5 N/A values (this may take a while)...");
     let (seed, mut rand) = init_rand();
     let unique_ids = (0..args.number_of_rows)
@@ -308,7 +307,7 @@ fn id5(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn id6(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
+fn create_id6(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     log::info!("Creating id6 N/A values (this may take a while)...");
     let (seed, mut rand) = init_rand();
     let unique_ids = (0..args.number_of_rows)
@@ -342,7 +341,7 @@ fn id6(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn v1(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
+fn create_v1(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     log::info!("Creating v1 N/A indices (this may take a while)...");
     let indices: KeySet<usize> = (0..args.number_of_rows as usize).choose(
         (args.number_of_rows * args.nas_ratio / 100)
@@ -372,7 +371,7 @@ fn v1(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn v2(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
+fn create_v2(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     log::info!("Creating v2 N/A indices (this may take a while)...");
     let indices: KeySet<usize> = (0..args.number_of_rows as usize).choose(
         (args.number_of_rows * args.nas_ratio / 100)
@@ -402,7 +401,7 @@ fn v2(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn v3(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
+fn create_v3(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     log::info!("Creating v3 N/A indices (this may take a while)...");
     let indices: KeySet<usize> = (0..args.number_of_rows as usize).choose(
         (args.number_of_rows * args.nas_ratio / 100)
@@ -432,7 +431,7 @@ fn v3(file: &mut fs::File, args: &Args, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn merge(
+fn join(
     mut id1_csv: fs::File,
     mut id2_csv: fs::File,
     mut id3_csv: fs::File,
@@ -445,7 +444,7 @@ fn merge(
     args: &Args,
     config: &Config,
 ) -> Result<()> {
-    log::info!("Merging columns...");
+    log::info!("Joining columns...");
     let mut path = path::PathBuf::new();
     path.push(&args.dir);
     path.push(format!(
@@ -478,12 +477,12 @@ fn merge(
         &mut v2_reader,
         &mut v3_reader,
     ]);
-    hstack(&mut csv_writer, &mut zipped_iter).context("failed to merge columns")?;
-    log::info!("Merged columns...");
+    hstack(&mut csv_writer, &mut zipped_iter).context("failed to join columns")?;
+    log::info!("Joined columns...");
     Ok(())
 }
 
-fn merge_with_sort(
+fn join_with_sort(
     mut id1_csv: fs::File,
     mut id2_csv: fs::File,
     mut id3_csv: fs::File,
@@ -533,8 +532,7 @@ fn merge_with_sort(
     let number_of_runs = args.number_of_rows / args.run_size + 1;
     if number_of_runs <= 1 {
         log::info!("Sorting single run...");
-        sort_chunk(None, &mut csv_writer, &mut zipped_iter)
-            .context("failed to merge-sort columns")?;
+        sort_chunk(None, &mut csv_writer, &mut zipped_iter).context("failed to sort a chunk")?;
         log::info!("Sorted single run...");
     } else {
         log::info!("Sorting {} runs...", number_of_runs);
@@ -553,7 +551,7 @@ fn merge_with_sort(
                 &mut chunk_writer,
                 &mut zipped_iter,
             )
-            .context("failed to merge-sort columns")?;
+            .context("failed to sort a chunk")?;
             runs.push(name.clone());
         }
         log::info!("Sorted {} runs...", number_of_runs);
@@ -568,7 +566,7 @@ fn merge_with_sort(
         drop(v2_csv);
         drop(v3_csv);
 
-        log::info!("Merging rows...");
+        log::info!("Joining rows...");
         let mut runs: Vec<_> = runs
             .iter()
             .filter_map(|run| {
@@ -579,8 +577,8 @@ fn merge_with_sort(
             })
             .map(|chunk| config.from_reader(chunk))
             .collect();
-        merge_sort(&mut csv_writer, &mut runs).context("failed to merge columns")?;
-        log::info!("Merged rows...");
+        merge_sort(&mut csv_writer, &mut runs).context("failed to merge-sort chunks")?;
+        log::info!("Joined rows...");
     }
     log::info!("Sorted rows...");
     Ok(())
