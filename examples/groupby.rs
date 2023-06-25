@@ -496,6 +496,7 @@ fn merge_with_sort(
     args: &Args,
     config: &Config,
 ) -> Result<()> {
+    log::info!("Sorting rows...");
     let mut path = path::PathBuf::new();
     path.push(&args.dir);
     path.push(format!(
@@ -531,11 +532,11 @@ fn merge_with_sort(
 
     let number_of_runs = args.number_of_rows / args.run_size + 1;
     if number_of_runs <= 1 {
-        log::info!("Merging columns - single run...");
+        log::info!("Sorting single run...");
         sort_chunk(None, &mut csv_writer, &mut zipped_iter)
             .context("failed to merge-sort columns")?;
     } else {
-        log::info!("Sorting columns - {} runs...", number_of_runs);
+        log::info!("Sorting {} runs...", number_of_runs);
         let working_dir = tempfile::tempdir().context("failed to create a temporary directory")?;
         let mut runs = vec![];
         for i in (0..number_of_runs).progress() {
@@ -565,7 +566,7 @@ fn merge_with_sort(
         drop(v2_csv);
         drop(v3_csv);
 
-        log::info!("Merging columns...");
+        log::info!("Merging rows...");
         let mut runs: Vec<_> = runs
             .iter()
             .filter_map(|run| {
@@ -578,6 +579,6 @@ fn merge_with_sort(
             .collect();
         merge_sort(&mut csv_writer, &mut runs).context("failed to merge columns")?;
     }
-    log::info!("Merged columns...");
+    log::info!("Sorted rows...");
     Ok(())
 }
