@@ -535,6 +535,7 @@ fn merge_with_sort(
         log::info!("Sorting single run...");
         sort_chunk(None, &mut csv_writer, &mut zipped_iter)
             .context("failed to merge-sort columns")?;
+        log::info!("Sorted single run...");
     } else {
         log::info!("Sorting {} runs...", number_of_runs);
         let working_dir = tempfile::tempdir().context("failed to create a temporary directory")?;
@@ -555,6 +556,7 @@ fn merge_with_sort(
             .context("failed to merge-sort columns")?;
             runs.push(name.clone());
         }
+        log::info!("Sorted {} runs...", number_of_runs);
 
         drop(id1_csv);
         drop(id2_csv);
@@ -578,6 +580,7 @@ fn merge_with_sort(
             .map(|chunk| config.from_reader(chunk))
             .collect();
         merge_sort(&mut csv_writer, &mut runs).context("failed to merge columns")?;
+        log::info!("Merged rows...");
     }
     log::info!("Sorted rows...");
     Ok(())
